@@ -43,6 +43,33 @@ const MOCK_CROSSHAIRS = [
     centerDot: true, dotOpacity: 1, dotThickness: 1,
     innerLines: false, outerLines: false 
   },
+  { 
+    id: '5', name: 'Classic Green', code: '0;P;c;1;o;1;0t;1;0l;4;0o;2;0a;1;0f;0;1b;0', author: 'ScreaM', type: 'plus', color: '#00ff00', 
+    outlines: true, outlineOpacity: 1, outlineThickness: 1,
+    centerDot: false,
+    innerLines: true, innerOpacity: 1, innerLength: 4, innerThickness: 1, innerOffset: 2,
+    outerLines: false 
+  },
+  { 
+    id: '6', name: 'Cyan Cross', code: '0;P;c;5;h;0;0l;4;0o;2;0a;1;0f;0;1b;0', author: 'yay', type: 'plus', color: '#00ffff', 
+    outlines: false,
+    centerDot: false,
+    innerLines: true, innerOpacity: 1, innerLength: 4, innerThickness: 2, innerOffset: 2,
+    outerLines: false 
+  },
+  { 
+    id: '7', name: 'White Box', code: '0;P;o;1;d;1;z;4;0b;0;1b;0', author: 'Boaster', type: 'dot', color: '#ffffff', 
+    outlines: true, outlineOpacity: 1, outlineThickness: 1,
+    centerDot: true, dotOpacity: 1, dotThickness: 4,
+    innerLines: false, outerLines: false 
+  },
+  { 
+    id: '8', name: 'Yellow Star', code: '0;P;c;4;h;0;0l;3;0o;2;0a;1;0f;0;1t;3;1l;1;1o;1;1a;1;1m;0;1f;0', author: 'FNS', type: 'plus', color: '#ffff00', 
+    outlines: false,
+    centerDot: false,
+    innerLines: true, innerOpacity: 1, innerLength: 3, innerThickness: 2, innerOffset: 2,
+    outerLines: true, outerOpacity: 1, outerLength: 1, outerThickness: 3, outerOffset: 1 
+  }
 ];
 
 const MOCK_PRO_PROFILES = [
@@ -55,6 +82,12 @@ const MOCK_PRO_PROFILES = [
   { id: 7, name: "Demon1", team: "NRG", role: "Duelist", image_url: "https://picsum.photos/seed/demon1/400/400", crosshair_code: "0;P;c;1;o;1;d;1;0l;0;0o;2;0a;1;0f;0;1b;0" },
   { id: 8, name: "Less", team: "LOUD", role: "Sentinel", image_url: "https://picsum.photos/seed/less/400/400", crosshair_code: "0;P;c;8;u;000000FF;o;1;b;1;f;0;0t;1;0l;2;0v;2;0g;1;0o;2;0a;1;0f;0;1b;0" },
   { id: 9, name: "Alfajer", team: "Fnatic", role: "Sentinel", image_url: "https://picsum.photos/seed/alfajer/400/400", crosshair_code: "0;P;c;5;o;1;d;1;z;3;0t;1;0l;2;0o;2;0a;1;0f;0;1b;0" },
+  { id: 10, name: "yay", team: "Bleed", role: "Duelist", image_url: "https://picsum.photos/seed/yay/400/400", crosshair_code: "0;P;h;0;0l;4;0o;0;0a;1;0f;0;1b;0" },
+  { id: 11, name: "ScreaM", team: "Karmine Corp", role: "Duelist", image_url: "https://picsum.photos/seed/scream/400/400", crosshair_code: "0;P;c;5;o;1;d;1;z;3;0b;0;1b;0" },
+  { id: 12, name: "nAts", team: "Liquid", role: "Sentinel", image_url: "https://picsum.photos/seed/nats/400/400", crosshair_code: "0;P;c;1;o;1;0t;1;0l;2;0o;2;0a;1;0f;0;1b;0" },
+  { id: 13, name: "FNS", team: "NRG", role: "Controller", image_url: "https://picsum.photos/seed/fns/400/400", crosshair_code: "0;P;c;1;o;1;0l;3;0o;2;0a;1;0f;0;1b;0" },
+  { id: 14, name: "Zekken", team: "Sentinels", role: "Duelist", image_url: "https://picsum.photos/seed/zekken/400/400", crosshair_code: "0;P;c;1;o;1;d;1;0b;0;1b;0" },
+  { id: 15, name: "Something", team: "Paper Rex", role: "Duelist", image_url: "https://picsum.photos/seed/something/400/400", crosshair_code: "0;P;o;0.699;d;1;f;0;s;0;0t;1;0l;2;0o;2;0a;1;0f;0;1b;0" }
 ];
 
 // --- In-Memory Fallback Storage ---
@@ -162,7 +195,13 @@ if (process.env.DATABASE_URL && process.env.DATABASE_URL !== "") {
             ('Chronicle', 'Fnatic', 'Initiator', 'https://picsum.photos/seed/chronicle/400/400', '0;P;c;1;o;1;d;1;0l;0;0o;2;0a;1;0f;0;1b;0'),
             ('Demon1', 'NRG', 'Duelist', 'https://picsum.photos/seed/demon1/400/400', '0;P;c;1;o;1;d;1;0l;0;0o;2;0a;1;0f;0;1b;0'),
             ('Less', 'LOUD', 'Sentinel', 'https://picsum.photos/seed/less/400/400', '0;P;c;8;u;000000FF;o;1;b;1;f;0;0t;1;0l;2;0v;2;0g;1;0o;2;0a;1;0f;0;1b;0'),
-            ('Alfajer', 'Fnatic', 'Sentinel', 'https://picsum.photos/seed/alfajer/400/400', '0;P;c;5;o;1;d;1;z;3;0t;1;0l;2;0o;2;0a;1;0f;0;1b;0')
+            ('Alfajer', 'Fnatic', 'Sentinel', 'https://picsum.photos/seed/alfajer/400/400', '0;P;c;5;o;1;d;1;z;3;0t;1;0l;2;0o;2;0a;1;0f;0;1b;0'),
+            ('yay', 'Bleed', 'Duelist', 'https://picsum.photos/seed/yay/400/400', '0;P;h;0;0l;4;0o;0;0a;1;0f;0;1b;0'),
+            ('ScreaM', 'Karmine Corp', 'Duelist', 'https://picsum.photos/seed/scream/400/400', '0;P;c;5;o;1;d;1;z;3;0b;0;1b;0'),
+            ('nAts', 'Liquid', 'Sentinel', 'https://picsum.photos/seed/nats/400/400', '0;P;c;1;o;1;0t;1;0l;2;0o;2;0a;1;0f;0;1b;0'),
+            ('FNS', 'NRG', 'Controller', 'https://picsum.photos/seed/fns/400/400', '0;P;c;1;o;1;0l;3;0o;2;0a;1;0f;0;1b;0'),
+            ('Zekken', 'Sentinels', 'Duelist', 'https://picsum.photos/seed/zekken/400/400', '0;P;c;1;o;1;d;1;0b;0;1b;0'),
+            ('Something', 'Paper Rex', 'Duelist', 'https://picsum.photos/seed/something/400/400', '0;P;o;0.699;d;1;f;0;s;0;0t;1;0l;2;0o;2;0a;1;0f;0;1b;0')
           `);
         }
       } catch (dbErr) {

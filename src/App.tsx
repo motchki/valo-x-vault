@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calculator as CalculatorIcon, Copy, Check, Star, Shield, Zap, Layout, MousePointer2, Info, Plus, Search, Sliders, Share2, Loader2, User as UserIcon, LogOut } from 'lucide-react';
+import { Calculator as CalculatorIcon, Copy, Check, Star, Shield, Zap, Layout, MousePointer2, Info, Plus, Search, Sliders, Share2, Loader2, User as UserIcon, LogOut, Crosshair as CrosshairIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CrosshairPreview, Crosshair } from './components/CrosshairPreview';
 import { Tools } from './components/Calculator';
@@ -15,8 +15,9 @@ interface User {
 
 // --- Components ---
 
-const CrosshairCard: React.FC<{ crosshair: Crosshair }> = ({ crosshair }) => {
+const CrosshairCard: React.FC<{ crosshair: Crosshair, user: User | null, vaults: any[] }> = ({ crosshair, user, vaults }) => {
   const [copied, setCopied] = useState(false);
+  const [showVaultSelect, setShowVaultSelect] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(crosshair.code);
@@ -24,10 +25,33 @@ const CrosshairCard: React.FC<{ crosshair: Crosshair }> = ({ crosshair }) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleAddToVault = async (vaultId: string) => {
+    try {
+      const response = await fetch('/api/crosshairs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: crosshair.name,
+          code: crosshair.code,
+          author: crosshair.author,
+          vaultId: vaultId
+        })
+      });
+      if (response.ok) {
+        alert('Added to vault!');
+        setShowVaultSelect(false);
+      } else {
+        alert('Failed to add to vault');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <motion.div 
       whileHover={{ y: -6 }}
-      className="glass-card p-6 rounded-2xl flex flex-col gap-4 group"
+      className="glass-card p-6 rounded-2xl flex flex-col gap-4 group relative"
     >
       <div className="h-40">
         <CrosshairPreview crosshair={crosshair} />
@@ -44,15 +68,42 @@ const CrosshairCard: React.FC<{ crosshair: Crosshair }> = ({ crosshair }) => {
       <div className="bg-black/40 p-2 rounded-lg font-mono text-[10px] text-white/60 truncate border border-white/5">
         {crosshair.code}
       </div>
-      <button 
-        onClick={handleCopy}
-        className={`w-full py-2.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
-          copied ? 'bg-emerald-500 text-white' : 'bg-white/10 hover:bg-white/20 text-white'
-        }`}
-      >
-        {copied ? <Check size={16} /> : <Copy size={16} />}
-        {copied ? 'Copied!' : 'Copy Code'}
-      </button>
+      <div className="flex gap-2">
+        <button 
+          onClick={handleCopy}
+          className={`flex-1 py-2.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
+            copied ? 'bg-emerald-500 text-white' : 'bg-white/10 hover:bg-white/20 text-white'
+          }`}
+        >
+          {copied ? <Check size={16} /> : <Copy size={16} />}
+          {copied ? 'Copied!' : 'Copy'}
+        </button>
+        {user && vaults.length > 0 && (
+          <div className="relative">
+            <button 
+              onClick={() => setShowVaultSelect(!showVaultSelect)}
+              className="px-4 py-2.5 rounded-xl font-bold transition-all flex items-center justify-center bg-purple-600 hover:bg-purple-500 text-white"
+              title="Save to Vault"
+            >
+              <Plus size={16} />
+            </button>
+            {showVaultSelect && (
+              <div className="absolute right-0 bottom-full mb-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-xl overflow-hidden z-20">
+                <div className="p-2 text-xs font-bold text-white/40 uppercase border-b border-white/5">Select Vault</div>
+                {vaults.map(v => (
+                  <button 
+                    key={v.id}
+                    onClick={() => handleAddToVault(v.id)}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-white/5 transition-colors"
+                  >
+                    {v.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </motion.div>
   );
 };
@@ -666,8 +717,13 @@ export default function App() {
           className="text-2xl font-black tracking-tighter cursor-pointer flex items-center gap-3"
           onClick={() => setView('home')}
         >
-          <div className="flex items-baseline">
-            VALO<span className="text-purple-500">X</span>VAULT
+          <div className="flex items-center gap-2">
+            <div className="bg-purple-600 p-1.5 rounded-lg text-white">
+              <CrosshairIcon size={24} strokeWidth={2.5} />
+            </div>
+            <div className="flex items-baseline">
+              VALO<span className="text-purple-500">X</span>VAULT
+            </div>
           </div>
           {dbStatus?.mode === 'demo' && (
             <span className="text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full uppercase tracking-widest font-bold">
@@ -818,7 +874,7 @@ export default function App() {
                     </div>
                   ) : (
                     crosshairs.slice(0, 3).map(ch => (
-                      <CrosshairCard key={ch.id} crosshair={ch} />
+                      <CrosshairCard key={ch.id} crosshair={ch} user={user} vaults={vaults} />
                     ))
                   )}
                 </div>
@@ -853,7 +909,7 @@ export default function App() {
                   </div>
                 ) : (
                   crosshairs.map(ch => (
-                    <CrosshairCard key={ch.id} crosshair={ch} />
+                    <CrosshairCard key={ch.id} crosshair={ch} user={user} vaults={vaults} />
                   ))
                 )}
               </div>
