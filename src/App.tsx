@@ -5,6 +5,7 @@ import { CrosshairPreview, Crosshair } from './components/CrosshairPreview';
 import { Tools } from './components/Calculator';
 import { ProProfiles } from './components/ProProfiles';
 import { Vaults } from './components/Vaults';
+import { apiFetch } from './utils/api';
 
 interface User {
   id: number;
@@ -27,7 +28,7 @@ const CrosshairCard: React.FC<{ crosshair: Crosshair, user: User | null, vaults:
 
   const handleAddToVault = async (vaultId: string) => {
     try {
-      const response = await fetch('/api/crosshairs', {
+      const response = await apiFetch('/api/crosshairs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -173,7 +174,7 @@ const Editor = ({ onSave, user, vaults }: { onSave?: () => void, user: User | nu
     try {
       // Simple code generator
       const code = `0;P;c;${config.color?.replace('#', '')};o;${config.outlines ? '1' : '0'};d;${config.centerDot ? '1' : '0'};0l;${config.innerLength};0t;${config.innerThickness};0o;${config.innerOffset}`;
-      const response = await fetch('/api/crosshairs', {
+      const response = await apiFetch('/api/crosshairs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -486,7 +487,7 @@ export default function App() {
 
   const checkStatus = async () => {
     try {
-      const response = await fetch('/api/status');
+      const response = await apiFetch('/api/status');
       if (!response.ok) throw new Error('Status fetch failed');
       const data = await response.json();
       setDbStatus(data);
@@ -497,7 +498,7 @@ export default function App() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await apiFetch('/api/auth/me');
       if (response.ok) {
         const data = await response.json();
         setUser(data);
@@ -509,7 +510,7 @@ export default function App() {
 
   const fetchCrosshairs = async () => {
     try {
-      const response = await fetch('/api/crosshairs');
+      const response = await apiFetch('/api/crosshairs');
       if (!response.ok) throw new Error('Crosshairs fetch failed');
       const data = await response.json();
       if (Array.isArray(data)) {
@@ -528,7 +529,7 @@ export default function App() {
 
   const fetchVaults = async () => {
     try {
-      const response = await fetch('/api/vaults');
+      const response = await apiFetch('/api/vaults');
       if (!response.ok) throw new Error('Vaults fetch failed');
       const data = await response.json();
       if (Array.isArray(data)) setVaults(data);
@@ -554,14 +555,15 @@ export default function App() {
     
     try {
       const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/register';
-      const response = await fetch(endpoint, {
+      const response = await apiFetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
       
       if (response.ok) {
-        const userData = await response.json();
+        const { user: userData, token } = await response.json();
+        localStorage.setItem('token', token);
         setUser(userData);
         setShowAuthModal(false);
         fetchVaults();
@@ -575,7 +577,8 @@ export default function App() {
   };
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    await apiFetch('/api/auth/logout', { method: 'POST' });
+    localStorage.removeItem('token');
     setUser(null);
     setView('home');
   };
@@ -591,7 +594,7 @@ export default function App() {
     };
 
     try {
-      const response = await fetch('/api/crosshairs', {
+      const response = await apiFetch('/api/crosshairs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -731,9 +734,10 @@ export default function App() {
             <div className="flex items-center gap-2 md:gap-4">
               <button 
                 onClick={() => setShowSubmitModal(true)}
-                className="hidden sm:block px-3 md:px-5 py-2 rounded-xl border border-white/10 text-xs md:text-sm font-bold hover:bg-white/5 transition-all"
+                className="px-3 md:px-5 py-2 rounded-xl border border-white/10 text-xs md:text-sm font-bold hover:bg-white/5 transition-all flex items-center gap-2"
               >
-                Submit
+                <Plus size={14} className="sm:hidden" />
+                <span className="hidden sm:inline">Submit</span>
               </button>
               <div className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/5 rounded-xl border border-white/10">
                 <UserIcon size={14} className="text-purple-400" />

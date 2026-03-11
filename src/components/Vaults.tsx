@@ -1,3 +1,4 @@
+import { apiFetch } from '../utils/api';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Plus, Users, Share2, Copy, Check, Loader2, Folder, ArrowLeft, UserPlus } from 'lucide-react';
@@ -25,7 +26,7 @@ export const Vaults: React.FC<{ user: any }> = ({ user }) => {
 
   const fetchVaults = async () => {
     try {
-      const res = await fetch('/api/vaults');
+      const res = await apiFetch('/api/vaults');
       const data = await res.json();
       if (Array.isArray(data)) setVaults(data);
     } catch (err) {
@@ -37,7 +38,7 @@ export const Vaults: React.FC<{ user: any }> = ({ user }) => {
 
   const fetchVaultCrosshairs = async (vaultId: number) => {
     try {
-      const res = await fetch(`/api/crosshairs?vaultId=${vaultId}`);
+      const res = await apiFetch(`/api/crosshairs?vaultId=${vaultId}`);
       const data = await res.json();
       if (Array.isArray(data)) setVaultCrosshairs(data);
     } catch (err) {
@@ -51,7 +52,7 @@ export const Vaults: React.FC<{ user: any }> = ({ user }) => {
     const name = formData.get('name') as string;
 
     try {
-      const res = await fetch('/api/vaults', {
+      const res = await apiFetch('/api/vaults', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name })
@@ -71,7 +72,7 @@ export const Vaults: React.FC<{ user: any }> = ({ user }) => {
     const inviteCode = formData.get('inviteCode') as string;
 
     try {
-      const res = await fetch('/api/vaults/join', {
+      const res = await apiFetch('/api/vaults/join', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ inviteCode })
@@ -167,21 +168,21 @@ export const Vaults: React.FC<{ user: any }> = ({ user }) => {
 
   return (
     <div className="space-y-12">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 className="text-3xl font-black tracking-tighter uppercase">My Vaults</h2>
           <p className="text-white/40">Group and share crosshairs with your team.</p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-2 md:gap-4 w-full md:w-auto">
           <button 
             onClick={() => setShowJoinModal(true)}
-            className="px-6 py-3 rounded-xl border border-white/10 font-bold hover:bg-white/5 transition-all flex items-center gap-2"
+            className="flex-1 md:flex-none px-4 md:px-6 py-3 rounded-xl border border-white/10 font-bold hover:bg-white/5 transition-all flex items-center justify-center gap-2 text-sm md:text-base"
           >
             <UserPlus size={18} /> Join Vault
           </button>
           <button 
             onClick={() => setShowCreateModal(true)}
-            className="px-6 py-3 rounded-xl bg-purple-600 font-bold hover:bg-purple-500 transition-all flex items-center gap-2 shadow-lg shadow-purple-500/20"
+            className="flex-1 md:flex-none px-4 md:px-6 py-3 rounded-xl bg-purple-600 font-bold hover:bg-purple-500 transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20 text-sm md:text-base"
           >
             <Plus size={18} /> Create Vault
           </button>
