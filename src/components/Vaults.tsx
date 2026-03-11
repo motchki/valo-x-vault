@@ -189,7 +189,7 @@ export const Vaults: React.FC<{ user: any }> = ({ user }) => {
       </div>
 
       {vaults.length === 0 ? (
-        <div className="glass-card p-20 rounded-3xl text-center space-y-6">
+        <div className="glass-card p-8 md:p-20 rounded-3xl text-center space-y-6">
           <div className="w-20 h-20 bg-purple-600/20 rounded-full flex items-center justify-center mx-auto">
             <Folder size={40} className="text-purple-500" />
           </div>

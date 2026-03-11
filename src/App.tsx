@@ -854,7 +854,7 @@ export default function App() {
 
               {/* Featured Crosshairs */}
               <section className="space-y-12">
-                <div className="flex justify-between items-end">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                   <div className="space-y-2">
                     <h2 className="text-3xl font-black tracking-tight">REAL PREVIEWS. PROVEN DESIGNS.</h2>
                     <p className="text-white/40">The most popular crosshairs used by the community this week.</p>
