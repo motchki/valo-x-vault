@@ -51,7 +51,7 @@ const CrosshairCard: React.FC<{ crosshair: Crosshair, user: User | null, vaults:
   return (
     <motion.div 
       whileHover={{ y: -6 }}
-      className="glass-card p-6 rounded-2xl flex flex-col gap-4 group relative"
+      className="glass-card p-4 md:p-6 rounded-2xl flex flex-col gap-4 group relative"
     >
       <div className="h-40">
         <CrosshairPreview crosshair={crosshair} />
@@ -487,6 +487,7 @@ export default function App() {
   const checkStatus = async () => {
     try {
       const response = await fetch('/api/status');
+      if (!response.ok) throw new Error('Status fetch failed');
       const data = await response.json();
       setDbStatus(data);
     } catch (err) {
@@ -509,6 +510,7 @@ export default function App() {
   const fetchCrosshairs = async () => {
     try {
       const response = await fetch('/api/crosshairs');
+      if (!response.ok) throw new Error('Crosshairs fetch failed');
       const data = await response.json();
       if (Array.isArray(data)) {
         setCrosshairs(data);
@@ -527,6 +529,7 @@ export default function App() {
   const fetchVaults = async () => {
     try {
       const response = await fetch('/api/vaults');
+      if (!response.ok) throw new Error('Vaults fetch failed');
       const data = await response.json();
       if (Array.isArray(data)) setVaults(data);
     } catch (err) {
@@ -630,15 +633,9 @@ export default function App() {
                 {authMode === 'login' ? 'Welcome Back' : 'Join the Vault'}
               </h2>
               <form onSubmit={handleAuth} className="space-y-4">
-                {authMode === 'signup' && (
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-white/40 uppercase">Email</label>
-                    <input name="email" required type="email" placeholder="you@example.com" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500" />
-                  </div>
-                )}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-white/40 uppercase">{authMode === 'login' ? 'Username or Email' : 'Username'}</label>
-                  <input name="username" required type="text" placeholder={authMode === 'login' ? "Username or Email" : "Your username"} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500" />
+                  <label className="text-xs font-bold text-white/40 uppercase">Username</label>
+                  <input name="username" required type="text" placeholder="Your username" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-white/40 uppercase">Password</label>
@@ -712,9 +709,9 @@ export default function App() {
       </AnimatePresence>
 
       {/* Navbar */}
-      <header className="flex justify-between items-center px-8 py-6 max-w-7xl mx-auto">
+      <header className="flex flex-wrap justify-between items-center px-4 md:px-8 py-4 md:py-6 max-w-7xl mx-auto gap-4">
         <div 
-          className="text-2xl font-black tracking-tighter cursor-pointer flex items-center gap-3"
+          className="text-xl md:text-2xl font-black tracking-tighter cursor-pointer flex items-center gap-3"
           onClick={() => setView('home')}
         >
           <div className="flex items-center gap-2">
@@ -723,59 +720,61 @@ export default function App() {
             </div>
           </div>
           {dbStatus?.mode === 'demo' && (
-            <span className="text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full uppercase tracking-widest font-bold">
+            <span className="text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full uppercase tracking-widest font-bold hidden sm:inline-block">
               Demo Mode
             </span>
           )}
         </div>
-        <nav className="hidden md:flex gap-8 text-sm font-medium text-white/60">
-          <button onClick={() => setView('browse')} className={`hover:text-white transition-colors ${view === 'browse' ? 'text-white' : ''}`}>Browse</button>
-          <button onClick={() => setView('editor')} className={`hover:text-white transition-colors ${view === 'editor' ? 'text-white' : ''}`}>Editor</button>
-          <button onClick={() => setView('pro')} className={`hover:text-white transition-colors ${view === 'pro' ? 'text-white' : ''}`}>Pro Profiles</button>
-          {user && <button onClick={() => setView('vaults')} className={`hover:text-white transition-colors ${view === 'vaults' ? 'text-white' : ''}`}>My Vaults</button>}
-          <button onClick={() => setView('tools')} className={`hover:text-white transition-colors ${view === 'tools' ? 'text-white' : ''}`}>Tools</button>
-        </nav>
-        <div className="flex gap-4">
+
+        <div className="flex gap-2 md:gap-4 order-2 md:order-3">
           {user ? (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4">
               <button 
                 onClick={() => setShowSubmitModal(true)}
-                className="hidden sm:block px-5 py-2 rounded-xl border border-white/10 text-sm font-bold hover:bg-white/5 transition-all"
+                className="hidden sm:block px-3 md:px-5 py-2 rounded-xl border border-white/10 text-xs md:text-sm font-bold hover:bg-white/5 transition-all"
               >
-                Submit Code
+                Submit
               </button>
-              <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/10">
-                <UserIcon size={16} className="text-purple-400" />
-                <span className="text-sm font-bold">{user.username}</span>
+              <div className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/5 rounded-xl border border-white/10">
+                <UserIcon size={14} className="text-purple-400" />
+                <span className="text-xs md:text-sm font-bold truncate max-w-[80px] md:max-w-none">{user.username}</span>
               </div>
               <button 
                 onClick={handleLogout}
                 className="p-2 rounded-xl hover:bg-red-500/10 text-red-400 transition-all"
                 title="Logout"
               >
-                <LogOut size={20} />
+                <LogOut size={16} />
               </button>
             </div>
           ) : (
             <>
               <button 
                 onClick={() => { setAuthMode('login'); setShowAuthModal(true); }}
-                className="hidden sm:block px-5 py-2 rounded-xl border border-white/10 text-sm font-bold hover:bg-white/5 transition-all"
+                className="px-3 md:px-5 py-2 rounded-xl border border-white/10 text-xs md:text-sm font-bold hover:bg-white/5 transition-all"
               >
                 Login
               </button>
               <button 
                 onClick={() => { setAuthMode('signup'); setShowAuthModal(true); }}
-                className="px-5 py-2 rounded-xl bg-purple-600 text-sm font-bold hover:bg-purple-500 transition-all shadow-lg shadow-purple-500/20"
+                className="px-3 md:px-5 py-2 rounded-xl bg-purple-600 text-xs md:text-sm font-bold hover:bg-purple-500 transition-all shadow-lg shadow-purple-500/20"
               >
                 Sign Up
               </button>
             </>
           )}
         </div>
+
+        <nav className="flex overflow-x-auto w-full md:w-auto gap-6 md:gap-8 text-sm font-medium text-white/60 order-3 md:order-2 pb-2 md:pb-0 scrollbar-hide">
+          <button onClick={() => setView('browse')} className={`whitespace-nowrap hover:text-white transition-colors ${view === 'browse' ? 'text-white' : ''}`}>Browse</button>
+          <button onClick={() => setView('editor')} className={`whitespace-nowrap hover:text-white transition-colors ${view === 'editor' ? 'text-white' : ''}`}>Editor</button>
+          <button onClick={() => setView('pro')} className={`whitespace-nowrap hover:text-white transition-colors ${view === 'pro' ? 'text-white' : ''}`}>Pro Profiles</button>
+          {user && <button onClick={() => setView('vaults')} className={`whitespace-nowrap hover:text-white transition-colors ${view === 'vaults' ? 'text-white' : ''}`}>My Vaults</button>}
+          <button onClick={() => setView('tools')} className={`whitespace-nowrap hover:text-white transition-colors ${view === 'tools' ? 'text-white' : ''}`}>Tools</button>
+        </nav>
       </header>
 
-      <main className="max-w-7xl mx-auto px-8 py-12">
+      <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-12">
         <AnimatePresence mode="wait">
           {view === 'home' && (
             <motion.div 
@@ -791,24 +790,24 @@ export default function App() {
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="text-6xl md:text-8xl font-black leading-[0.9] tracking-tighter"
+                  className="text-5xl md:text-8xl font-black leading-[0.9] tracking-tighter"
                 >
                   PERFECT YOUR AIM.<br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">BUILD YOUR EDGE.</span>
                 </motion.h1>
-                <p className="text-white/40 max-w-2xl mx-auto text-lg">
+                <p className="text-white/40 max-w-2xl mx-auto text-base md:text-lg">
                   Empowering players with a curated collection of proven Valorant crosshair codes, real-time previews and community insights.
                 </p>
                 <div className="flex flex-wrap justify-center gap-4 pt-4">
                   <button 
                     onClick={() => setView('browse')}
-                    className="px-8 py-4 bg-purple-600 rounded-2xl font-bold text-lg hover:bg-purple-500 transition-all shadow-xl shadow-purple-500/20"
+                    className="px-6 md:px-8 py-3 md:py-4 bg-purple-600 rounded-2xl font-bold text-base md:text-lg hover:bg-purple-500 transition-all shadow-xl shadow-purple-500/20"
                   >
                     Browse All Crosshairs
                   </button>
                   <button 
                     onClick={() => setView('editor')}
-                    className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl font-bold text-lg hover:bg-white/10 transition-all backdrop-blur-sm"
+                    className="px-6 md:px-8 py-3 md:py-4 bg-white/5 border border-white/10 rounded-2xl font-bold text-base md:text-lg hover:bg-white/10 transition-all backdrop-blur-sm"
                   >
                     Open Advanced Editor
                   </button>
@@ -841,7 +840,7 @@ export default function App() {
                     <motion.div 
                       key={i}
                       whileHover={{ y: -8 }}
-                      className="glass-card p-8 rounded-3xl space-y-4 group cursor-default"
+                      className="glass-card p-6 md:p-8 rounded-3xl space-y-4 group cursor-default"
                     >
                       <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
                         {f.icon}
@@ -973,9 +972,9 @@ export default function App() {
         </AnimatePresence>
       </main>
 
-      <footer className="max-w-7xl mx-auto px-8 py-12 border-t border-white/5 mt-24 flex flex-col md:flex-row justify-between items-center gap-8 text-white/20 text-sm">
+      <footer className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12 border-t border-white/5 mt-12 md:mt-24 flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8 text-white/20 text-sm text-center md:text-left">
         <div className="font-black tracking-tighter text-white/40 uppercase">VALOXVAULT</div>
-        <div className="flex gap-8">
+        <div className="flex flex-wrap justify-center gap-4 md:gap-8">
           <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
           <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
           <a href="#" className="hover:text-white transition-colors">Contact</a>

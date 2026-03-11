@@ -241,7 +241,7 @@ async function startServer() {
   // --- Auth Routes ---
 
   app.post("/api/auth/register", async (req, res) => {
-    const { username, password, email } = req.body;
+    const { username, password } = req.body;
     if (!username || !password) return res.status(400).json({ error: "Missing fields" });
 
     try {
@@ -250,23 +250,23 @@ async function startServer() {
 
       if (isDbConnected) {
         const result = await pool.query(
-          "INSERT INTO users (username, password_hash, email) VALUES ($1, $2, $3) RETURNING id, username, email",
-          [username, hashedPassword, email || null]
+          "INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id, username",
+          [username, hashedPassword]
         );
         user = result.rows[0];
       } else {
         if (inMemoryUsers.find(u => u.username === username)) {
           return res.status(400).json({ error: "Username already exists" });
         }
-        user = { id: Date.now(), username, email };
+        user = { id: Date.now(), username };
         inMemoryUsers.push({ ...user, password_hash: hashedPassword });
       }
       
-      const token = jwt.sign({ id: user.id, username: user.username, email: user.email }, JWT_SECRET, { expiresIn: "24h" });
+      const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: "24h" });
       res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none" });
       res.json(user);
     } catch (err: any) {
-      if (err.code === "23505") return res.status(400).json({ error: "Username or email already exists" });
+      if (err.code === "23505") return res.status(400).json({ error: "Username already exists" });
       console.error(err);
       res.status(500).json({ error: "Server error" });
     }
@@ -277,19 +277,19 @@ async function startServer() {
     try {
       let user;
       if (isDbConnected) {
-        const result = await pool.query("SELECT * FROM users WHERE username = $1 OR email = $1", [username]);
+        const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
         user = result.rows[0];
       } else {
-        user = inMemoryUsers.find(u => u.username === username || u.email === username);
+        user = inMemoryUsers.find(u => u.username === username);
       }
       
       if (!user || !user.password_hash || !(await bcrypt.compare(password, user.password_hash))) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
-      const token = jwt.sign({ id: user.id, username: user.username, email: user.email }, JWT_SECRET, { expiresIn: "24h" });
+      const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: "24h" });
       res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none" });
-      res.json({ id: user.id, username: user.username, email: user.email });
+      res.json({ id: user.id, username: user.username });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Server error" });
