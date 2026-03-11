@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calculator as CalculatorIcon, Copy, Check, Star, Shield, Zap, Layout, MousePointer2, Info, Plus, Search, Sliders, Share2, Loader2, User as UserIcon, LogOut, Crosshair as CrosshairIcon } from 'lucide-react';
+import { Calculator as CalculatorIcon, Copy, Check, Star, Shield, Zap, Layout, MousePointer2, Info, Plus, Search, Sliders, Share2, Loader2, User as UserIcon, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CrosshairPreview, Crosshair } from './components/CrosshairPreview';
 import { Tools } from './components/Calculator';
@@ -718,9 +718,6 @@ export default function App() {
           onClick={() => setView('home')}
         >
           <div className="flex items-center gap-2">
-            <div className="bg-purple-600 p-1.5 rounded-lg text-white">
-              <CrosshairIcon size={24} strokeWidth={2.5} />
-            </div>
             <div className="flex items-baseline">
               VALO<span className="text-purple-500">X</span>VAULT
             </div>
